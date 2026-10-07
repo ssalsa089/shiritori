@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shiritori Hiragana - 2 Đội</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Nunito:wght@400;600;700&display=swap');
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Nunito', 'Noto Sans JP', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      color: #333;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 560px;
+      width: 100%;
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+      color: white;
+      padding: 24px 20px;
+      text-align: center;
+    }
+    
+    .header h1 { font-size: 1.7rem; margin-bottom: 4px; }
+    .header p { font-size: 0.9rem; opacity: 0.9; }
+    
+    /* ===== START SCREEN ===== */
+    .start-screen { padding: 28px 24px; }
+    
+    .start-screen h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+      font-size: 1.3rem;
+    }
+    
+    .theme-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .theme-btn {
+      padding: 16px 8px;
+      border: 3px solid #e0e0e0;
+      border-radius: 16px;
+      background: #f8f9fa;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      font-weight: 600;
+    }
+    
+    .theme-btn:hover { border-color: #667eea; }
+    .theme-btn.active {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #667eea22, #764ba222);
+      color: #5a4fcf;
+    }
+    
+    .theme-btn .icon { font-size: 1.8rem; display: block; margin-bottom: 6px; }
+    .theme-btn .name { font-size: 0.95rem; }
+    
+    .team-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .team-input label {
+      display: block;
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    
+    .team-input input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      font-size: 1rem;
+      outline: none;
+      font-family: inherit;
+    }
+    
+    .team-input input:focus { border-color: #667eea; }
+    
+    .start-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    
+    .start-btn:active { transform: scale(0.98); }
+    
+    /* ===== GAME SCREEN ===== */
+    .game-screen { display: none; padding: 24px 20px; }
+    
+    .score-board {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    
+    .score-card {
+      flex: 1;
+      background: #f8f9fa;
+      border-radius: 16px;
+      padding: 14px;
+      text-align: center;
+      border: 3px solid transparent;
+      transition: all 0.25s;
+    }
+    
+    .score-card.active {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #667eea15, #764ba215);
+      transform: scale(1.03);
+    }
+    
+    .score-card .team-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #555;
+    }
+    
+    .score-card .score {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #ee5a24;
+    }
+    
+    .score-card .turn-label {
+      font-size: 0.75rem;
+      color: #667eea;
+      font-weight: 600;
+      margin-top: 2px;
+      opacity: 0;
+    }
+    
+    .score-card.active .turn-label { opacity: 1; }
+    
+    .chain-info {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #888;
+      margin-bottom: 16px;
+    }
+    
+    .current-word-box {
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      border-radius: 20px;
+      padding: 22px;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+    
+    .current-word-box .label {
+      font-size: 0.85rem;
+      color: #555;
+      margin-bottom: 6px;
+    }
+    
+    .current-word {
+      font-size: 2.6rem;
+      font-weight: 700;
+      color: #2d3436;
+      letter-spacing: 3px;
+      font-family: 'Noto Sans JP', sans-serif;
+    }
+    
+    .next-hint {
+      margin-top: 10px;
+      font-size: 1.05rem;
+      color: #e17055;
+      font-weight: 600;
+    }
+    
+    .next-hint span {
+      background: #fff;
+      padding: 3px 12px;
+      border-radius: 8px;
+      font-size: 1.35rem;
+      display: inline-block;
+      margin-left: 4px;
+    }
+    
+    .theme-badge {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      margin-bottom: 12px;
+    }
+    
+    .message {
+      text-align: center;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      font-weight: 600;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+    }
+    
+    .message.success { background: #d4edda; color: #155724; }
+    .message.error { background: #f8d7da; color: #721c24; }
+    .message.info { background: #d1ecf1; color: #0c5460; }
+    .message.warning { background: #fff3cd; color: #856404; }
+    
+    .input-area { margin-bottom: 14px; }
+    
+    .input-area input {
+      width: 100%;
+      padding: 15px 16px;
+      font-size: 1.35rem;
+      border: 3px solid #ddd;
+      border-radius: 14px;
+      outline: none;
+      text-align: center;
+      font-family: 'Noto Sans JP', sans-serif;
+      letter-spacing: 2px;
+      transition: border-color 0.2s;
+    }
+    
+    .input-area input:focus { border-color: #667eea; }
+    .input-area input::placeholder {
+      color: #bbb;
+      letter-spacing: 0;
+      font-size: 0.95rem;
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    
+    button {
+      flex: 1;
+      padding: 13px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
+      font-family: inherit;
+    }
+    
+    button:active { transform: scale(0.97); }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+    
+    .btn-submit {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+    
+    .btn-skip {
+      background: #ffeaa7;
+      color: #2d3436;
+    }
+    
+    .btn-restart {
+      background: #dfe6e9;
+      color: #2d3436;
+    }
+    
+    .history {
+      background: #f8f9fa;
+      border-radius: 16px;
+      padding: 14px;
+      max-height: 140px;
+      overflow-y: auto;
+    }
+    
+    .history h3 {
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    .history-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    
+    .history-item {
+      background: white;
+      padding: 5px 11px;
+      border-radius: 18px;
+      font-size: 0.9rem;
+      font-family: 'Noto Sans JP', sans-serif;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .history-item.team1 { border: 2px solid #667eea; }
+    .history-item.team2 { border: 2px solid #e17055; }
+    
+    .rules {
+      margin-top: 16px;
+      padding: 14px;
+      background: #f1f2f6;
+      border-radius: 14px;
+      font-size: 0.82rem;
+      color: #555;
+      line-height: 1.55;
+    }
+    
+    .rules h4 { margin-bottom: 6px; color: #333; }
+    .rules ul { padding-left: 16px; }
+    
+    .footer {
+      text-align: center;
+      padding: 14px;
+      font-size: 0.78rem;
+      color: #999;
+      border-top: 1px solid #eee;
+    }
+    
+    @media (max-width: 480px) {
+      .current-word { font-size: 2.1rem; }
+      .theme-grid { grid-template-columns: 1fr; }
+      .team-inputs { grid-template-columns: 1fr; }
+    }
+
+    /* ===== MULTIPLAYER ===== */
+    .online-box {
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .online-box h3 { font-size: 1rem; margin-bottom: 10px; color:#444; }
+    .online-row { display:flex; gap:8px; margin-bottom:10px; }
+    .online-row input {
+      flex:1; min-width:0; padding:11px 12px; border:2px solid #ddd;
+      border-radius:10px; font:inherit; outline:none;
+    }
+    .online-row input:focus { border-color:#667eea; }
+    .online-btn {
+      padding:11px 14px; border:none; border-radius:10px; cursor:pointer;
+      font-weight:700; background:#667eea; color:#fff;
+    }
+    .online-btn.secondary { background:#dfe6e9; color:#2d3436; }
+    .room-code {
+      display:inline-block; margin-top:4px; padding:6px 12px; border-radius:10px;
+      background:#fff; border:2px dashed #667eea; font-weight:800; letter-spacing:2px;
+    }
+    .online-status { font-size:.85rem; color:#666; min-height:20px; line-height:1.4; }
+    .players-list { font-size:.85rem; margin-top:8px; color:#555; }
+    .hidden { display:none !important; }
+    .connection-dot {
+      display:inline-block; width:9px; height:9px; border-radius:50%;
+      background:#f1c40f; margin-right:5px;
+    }
+    .connection-dot.ok { background:#2ecc71; }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>しりとり 🎮</h1>
+      <p>Game nối từ Hiragana • 2 Đội</p>
+    </div>
+    
+    <!-- START SCREEN -->
+    <div class="start-screen" id="startScreen">
+      <h2>しりとり Online 🎮</h2>
+
+      <div class="online-box">
+        <h3>🌐 Phòng chơi online</h3>
+        <div class="online-row">
+          <input type="text" id="playerName" placeholder="Tên của bạn" maxlength="12">
+        </div>
+        <div class="online-row">
+          <input type="text" id="roomInput" placeholder="Mã phòng (VD: ABC123)" maxlength="6">
+          <button class="online-btn secondary" id="joinBtn">Vào phòng</button>
+        </div>
+        <button class="online-btn" id="createBtn" style="width:100%;">＋ Tạo phòng mới</button>
+
+        <div id="roomInfo" class="hidden" style="margin-top:12px;text-align:center;">
+          <div>Đã tạo phòng. Gửi mã này cho người chơi còn lại:</div>
+          <div class="room-code" id="roomCodeDisplay">------</div>
+        </div>
+
+        <div class="online-status" id="onlineStatus" style="margin-top:10px;">
+          <span class="connection-dot" id="connectionDot"></span>
+          Chưa kết nối phòng.
+        </div>
+        <div class="players-list" id="playersList"></div>
+      </div>
+
+      <div id="hostControls" class="hidden">
+        <h2 style="margin-top:4px;">Chọn chủ đề</h2>
+
+        <div class="theme-grid">
+          <div class="theme-btn active" data-theme="general">
+            <span class="icon">🌐</span>
+            <span class="name">Tổng hợp</span>
+          </div>
+          <div class="theme-btn" data-theme="food">
+            <span class="icon">🍣</span>
+            <span class="name">Ẩm thực</span>
+          </div>
+          <div class="theme-btn" data-theme="economy">
+            <span class="icon">💰</span>
+            <span class="name">Kinh tế</span>
+          </div>
+        </div>
+
+        <button class="start-btn" id="startBtn">Bắt đầu chơi ▶️</button>
+      </div>
+
+      <div class="rules" style="margin-top:20px;">
+        <h4>📜 Luật chơi</h4>
+        <ul>
+          <li>Hai người lần lượt nối từ bằng <b>hiragana</b></li>
+          <li>Từ tiếp theo phải bắt đầu bằng chữ cái cuối của từ trước</li>
+          <li>Không được dùng lại từ đã nói</li>
+          <li>Kết thúc bằng <b>ん</b> → người chơi mất điểm</li>
+          <li>Chủ đề giới hạn từ vựng (Ẩm thực / Kinh tế / Tổng hợp)</li>
+          <li>Bỏ lượt sẽ bị trừ 1 điểm</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div class="game-screen" id="gameScreen">
+      <div style="text-align:center;">
+        <span class="theme-badge" id="themeBadge">🌐 Tổng hợp</span>
+      </div>
+      
+      <div class="score-board">
+        <div class="score-card active" id="scoreCard1">
+          <div class="team-name" id="displayTeam1">Đội Xanh</div>
+          <div class="score" id="score1">0</div>
+          <div class="turn-label">● Đang chơi</div>
+        </div>
+        <div class="score-card" id="scoreCard2">
+          <div class="team-name" id="displayTeam2">Đội Cam</div>
+          <div class="score" id="score2">0</div>
+          <div class="turn-label">● Đang chơi</div>
+        </div>
+      </div>
+      
+      <div class="chain-info">Chuỗi hiện tại: <strong id="chainLength">0</strong> từ</div>
+      
+      <div class="current-word-box">
+        <div class="label">Từ hiện tại</div>
+        <div class="current-word" id="currentWord">りんご</div>
+        <div class="next-hint">Từ tiếp theo bắt đầu bằng: <span id="nextKana">ご</span></div>
+      </div>
+      
+      <div class="message info" id="message">Lượt của Đội Xanh — nhập từ bắt đầu bằng 「ご」</div>
+      
+      <div class="input-area">
+        <input type="text" id="wordInput" placeholder="Nhập từ hiragana..." autocomplete="off">
+      </div>
+      
+      <div class="btn-group">
+        <button class="btn-submit" id="submitBtn">Gửi từ</button>
+        <button class="btn-skip" id="skipBtn">Bỏ lượt (−1)</button>
+        <button class="btn-restart" id="restartBtn">Chơi lại</button>
+      </div>
+      
+      <div class="history">
+        <h3>Lịch sử từ đã dùng</h3>
+        <div class="history-list" id="historyList"></div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      Made for học tiếng Nhật • Hiragana Shiritori 2 Đội
+    </div>
+  </div>
+
+  <script>
+    // ===================== TỪ ĐIỂN THEO CHỦ ĐỀ =====================
+    const dictionaries = {
+      general: [
+        "あめ","いぬ","うみ","えき","おと","あか","あお","いえ","いす","うた","えび","おか","あさ","いし","うさぎ","えんぴつ","おにぎり","あひる",
+        "かさ","き","くるま","けむし","こえ","かみ","きつね","くも","けしごむ","こども","かめ","きりん","くつ","けいと","こあら","かえる","きのこ","くま",
+        "こい","かぎ","きって","くら","けいさつ","こま","かびん","きゅうり","さくら","すし","せかい","そら","さかな","しか","すいか","せんせい","そふ",
+        "さる","しんぶん","すずめ","せんぷうき","さいころ","しろ","すな","せみ","そば","さとう","しお","すもう","たまご","ちず","つき","てがみ","とけい",
+        "たこ","つる","てぶくろ","とら","たいこ","ちくわ","てれび","とり","たけ","ちかてつ","つり","てんぷら","とうふ","たんぽぽ","とんぼ","なつ","にく",
+        "ぬの","ねこ","のみもの","なし","にわ","ぬりえ","ねだん","のり","なみ","にんじん","ぬいぐるみ","ねつ","のうと","なべ","にじ","なまえ","にほん",
+        "はな","ひこうき","ふゆ","へや","ほし","はし","ひつじ","ふね","へび","ほん","はと","ひまわり","ふくろ","ほたる","はしご","ふで","はこ","ひょう",
+        "ふとん","まど","みず","むし","めがね","もり","まくら","みかん","むぎ","めし","もも","まつり","みみ","むら","めだま","まめ","みずうみ","むすめ",
+        "やま","ゆき","よる","やさい","ゆめ","ようふく","やね","ゆび","やぎ","ゆかた","ようじ","やど","らいおん","りす","るす","れいぞうこ","ろうそく",
+        "らっぱ","りんご","れもん","ろうか","らくだ","りょうり","れきし","らむね","りぼん","わたし","わに","わごむ","ぱんだ","ぺん","ばなな","ぶた",
+        "べんとう","ぼうし","がっこう","ぎんこう","ぐみ","げーむ","ごみ","ざっし","じしょ","ずぼん","ぞう","だいこん","でんしゃ","どあ","はなび","ひがし",
+        "いちご","うきわ","えほん","おちゃ","かばん","きゃべつ","くるみ","けーき","こおり","しゃしん","すーぷ","たいよう","つくえ","てれほん","とまと",
+        "なっとう","にっき","はみがき","ふうせん","めろん","やきゅう","ゆうびん","りょこう","れすとらん","わいん","くすり","とけい","まど","かみ"
+      ],
+      
+      food: [
+        "ごはん","すし","さかな","にく","たまご","やさい","くだもの","みず","おちゃ","ぱん","みそ","しお","さとう","のり","わさび",
+        "てんぷら","うどん","そば","らーめん","おにぎり","べんとう","とんかつ","やきとり","たこやき","やきそば","ぎょうざ","しゃぶしゃぶ",
+        "すきやき","おこのみやき","てっぱんやき","どんぶり","おやこどん","ぎゅうどん","うなぎ","さしみ","もち","あんぱん","かれー",
+        "ぎゅうにく","ぶたにく","とりにく","えび","かに","いか","たこ","まぐろ","サーモン","ほたて","いわし","あじ","さば",
+        "にんじん","じゃがいも","たまねぎ","きゃべつ","きゅうり","なす","だいこん","ほうれんそう","もやし","きのこ","トマト","ぴーまん",
+        "りんご","ばなな","いちご","みかん","もも","なし","すいか","めろん","ぶどう","さくらんぼ","れもん","かき","ゆず",
+        "ぎゅうにゅう","こーひー","じゅーす","びーる","おさけ","あいす","おかし","でざーと","さらだ","すーぷ","みそしる",
+        "しょうゆ","こしょう","あぶら","ばたー","ちーず","はむ","そーせーじ","べーこん","かれーらいす","ちゃーはん","おかゆ",
+        "そうめん","つけめん","かいてんずし","えきべん","てんどん","うなどん","やきにく","にぎり","まき","てまき","がり","あがり",
+        "めん","こめ","たべもの","のみもの","りょうり","しょくじ","あさごはん","ひるごはん","ばんごはん","おやつ","さけ","みりん"
+      ],
+      
+      economy: [
+        "かいしゃ","きぎょう","ぎんこう","しじょう","こうじょう","じむしょ","みせ","ゆうびんきょく","としょかん",
+        "おかね","かね","りえき","うりあげ","しゅうにゅう","ししゅつ","よさん","かかく","ねだん","ぶっか","かぶ","かぶか",
+        "とうし","しほん","ざいさん","しゃっきん","さいむ","あかじ","くろじ","げんきん","りょうがえ",
+        "けいざい","ゆしゅつ","ゆにゅう","じゅよう","きょうきゅう","ぜいきん","かんぜい","ぶっぴん","しょうひん",
+        "せいさん","しょうひ","ぼうえき","じょうしょう","ていか","げらく","ふきょう","けいき",
+        "しごと","かいしゃいん","しゃちょう","ぶちょう","かちょう","どうりょう","てんいん","きゃく","とりひき",
+        "けいやく","しょうだん","かいぎ","ほうこく","けいかく","もくひょう","せいこう","しっぱい","もんだい",
+        "にほん","かいがい","こくない","とち","たてもの","ばしょ","ばあい","ほうほう","じょうほう","しりょう",
+        "すうち","へいきん","わりあい","ひりつ","きかん","きげん","よやく","うりば","かいけい","もとで",
+        "しはらい","にゅうきん","しゅっきん","やすみ","きゅうけい","ぼうしゅう"
+      ]
+    };
+
+    // Lọc bỏ từ kết thúc bằng ん và trùng lặp
+    for (const key in dictionaries) {
+      dictionaries[key] = [...new Set(
+        dictionaries[key]
+          .filter(w => w.length >= 2 && !w.endsWith("ん") && /^[\u3040-\u309Fー]+$/.test(w))
+      )];
+    }
+
+
+  <!-- Firebase SDK: no npm/build step needed for this GitHub Pages version -->
+  <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-database-compat.js"></script>
+
+  <script>
+    // ============================================================
+    // FIREBASE CONFIG
+    // 1) Tạo Firebase project
+    // 2) Tạo Web App
+    // 3) Bật Realtime Database
+    // 4) Dán config Firebase của bạn vào đây
+    // ============================================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyBZGnuK8s91VoDEbbFKYyaKBsKlygBu5Uw",
+      authDomain: "shiritori67.firebaseapp.com",
+      databaseURL: "https://shiritori67-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "shiritori67",
+      storageBucket: "shiritori67.firebasestorage.app",
+      messagingSenderId: "41968871141",
+      appId: "1:41968871141:web:b0caf17827c29a4260d60c"
+    };
+
+    let firebaseReady = false;
+    try {
+      firebase.initializeApp(firebaseConfig);
+      window.db = firebase.database();
+      firebaseReady = !String(firebaseConfig.databaseURL).startsWith("DAN_");
+    } catch (e) {
+      console.error("Firebase init error:", e);
+    }
+
+    // ===================== MULTIPLAYER STATE =====================
+    let currentTheme = "general";
+    let roomId = "";
+    let myPlayerId = "";
+    let myRole = ""; // host / guest
+    let roomRef = null;
+    let roomListener = null;
+    let playerName = "";
+    let localRoomState = null;
+
+    // Local UI-only values
+    let lastRenderedHistory = [];
+    let gameStarted = false;
+
+    // ===================== DOM =====================
+    const startScreen = document.getElementById("startScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const themeBtns = document.querySelectorAll(".theme-btn");
+    const startBtn = document.getElementById("startBtn");
+    const createBtn = document.getElementById("createBtn");
+    const joinBtn = document.getElementById("joinBtn");
+    const playerNameInput = document.getElementById("playerName");
+    const roomInput = document.getElementById("roomInput");
+    const roomInfo = document.getElementById("roomInfo");
+    const roomCodeDisplay = document.getElementById("roomCodeDisplay");
+    const onlineStatus = document.getElementById("onlineStatus");
+    const playersList = document.getElementById("playersList");
+    const hostControls = document.getElementById("hostControls");
+    const connectionDot = document.getElementById("connectionDot");
+
+    const displayTeam1 = document.getElementById("displayTeam1");
+    const displayTeam2 = document.getElementById("displayTeam2");
+    const score1El = document.getElementById("score1");
+    const score2El = document.getElementById("score2");
+    const scoreCard1 = document.getElementById("scoreCard1");
+    const scoreCard2 = document.getElementById("scoreCard2");
+    const themeBadge = document.getElementById("themeBadge");
+    const currentWordEl = document.getElementById("currentWord");
+    const nextKanaEl = document.getElementById("nextKana");
+    const chainLengthEl = document.getElementById("chainLength");
+    const messageEl = document.getElementById("message");
+    const wordInput = document.getElementById("wordInput");
+    const historyList = document.getElementById("historyList");
+    const submitBtn = document.getElementById("submitBtn");
+    const skipBtn = document.getElementById("skipBtn");
+    const restartBtn = document.getElementById("restartBtn");
+
+    // ===================== HELPERS =====================
+    function setStatus(text, ok = false) {
+      onlineStatus.textContent = "";
+      const dot = document.createElement("span");
+      dot.className = "connection-dot" + (ok ? " ok" : "");
+      onlineStatus.appendChild(dot);
+      onlineStatus.appendChild(document.createTextNode(" " + text));
+    }
+
+    function showMessage(text, type = "info") {
+      messageEl.textContent = text;
+      messageEl.className = `message ${type}`;
+    }
+
+    function randomRoomCode() {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let code = "";
+      for (let i = 0; i < 6; i++) {
+        code += chars[Math.floor(Math.random() * chars.length)];
+      }
+      return code;
+    }
+
+    function randomPlayerId() {
+      return "p_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    }
+
+    function getLastKana(word) {
+      if (!word) return "";
+      const last = word[word.length - 1];
+      if (["ゃ", "ゅ", "ょ"].includes(last) && word.length >= 2) {
+        return word.slice(-2);
+      }
+      return last;
+    }
+
+    function getThemeName(theme) {
+      const map = { general: "🌐 Tổng hợp", food: "🍣 Ẩm thực", economy: "💰 Kinh tế" };
+      return map[theme] || theme;
+    }
+
+    function updateScores(state) {
+      score1El.textContent = state.score1 || 0;
+      score2El.textContent = state.score2 || 0;
+      chainLengthEl.textContent = (state.usedWords || []).length;
+
+      if (state.currentTeam === 1) {
+        scoreCard1.classList.add("active");
+        scoreCard2.classList.remove("active");
+      } else {
+        scoreCard2.classList.add("active");
+        scoreCard1.classList.remove("active");
+      }
+    }
+
+    function renderHistory(state) {
+      const history = state.history || [];
+      const signature = JSON.stringify(history);
+      if (signature === JSON.stringify(lastRenderedHistory)) return;
+      lastRenderedHistory = history;
+
+      historyList.innerHTML = "";
+      history.forEach(item => {
+        const span = document.createElement("span");
+        span.className = `history-item team${item.team}`;
+        span.textContent = item.word;
+        historyList.appendChild(span);
+      });
+      historyList.scrollTop = historyList.scrollHeight;
+    }
+
+    function renderState(state) {
+      if (!state) return;
+      localRoomState = state;
+
+      const p1 = state.players?.p1;
+      const p2 = state.players?.p2;
+
+      playersList.textContent =
+        `👤 Đội 1: ${p1?.name || "Đang chờ..."}  |  👤 Đội 2: ${p2?.name || "Đang chờ..."}`;
+
+      if (state.started) {
+        gameStarted = true;
+        startScreen.style.display = "none";
+        gameScreen.style.display = "block";
+
+        displayTeam1.textContent = p1?.name || "Đội 1";
+        displayTeam2.textContent = p2?.name || "Đội 2";
+        themeBadge.textContent = getThemeName(state.theme);
+        currentWordEl.textContent = state.currentWord || "—";
+        nextKanaEl.textContent = state.nextKana || "—";
+
+        updateScores(state);
+        renderHistory(state);
+
+        const myTeam = state.players?.p1?.id === myPlayerId ? 1 :
+                       state.players?.p2?.id === myPlayerId ? 2 : 0;
+
+        const myTurn = !state.gameOver && state.currentTeam === myTeam;
+        wordInput.disabled = !myTurn;
+        submitBtn.disabled = !myTurn;
+        skipBtn.disabled = !myTurn;
+
+        if (state.gameOver) {
+          showMessage("🎉 Ván chơi đã kết thúc! Chủ phòng có thể bắt đầu ván mới.", "success");
+        } else if (myTurn) {
+          showMessage(`🟢 Đến lượt bạn — nhập từ bắt đầu bằng 「${state.nextKana}」`, "info");
+          wordInput.focus();
+        } else {
+          const turnName = state.currentTeam === 1 ? (p1?.name || "Đội 1") : (p2?.name || "Đội 2");
+          showMessage(`⏳ Đang chờ ${turnName} nhập từ 「${state.nextKana}」...`, "warning");
+        }
+      } else {
+        // Lobby
+        hostControls.classList.toggle("hidden", myRole !== "host");
+        if (myRole === "host") {
+          if (p1 && p2) {
+            setStatus("Đã đủ 2 người. Bạn có thể bắt đầu game.", true);
+            startBtn.disabled = false;
+          } else {
+            setStatus("Đang chờ người chơi thứ 2...", true);
+            startBtn.disabled = true;
+          }
+        } else {
+          setStatus("Đã vào phòng. Chờ chủ phòng bắt đầu...", true);
+        }
+      }
+    }
+
+    // ===================== ROOM LISTENER =====================
+    function listenToRoom() {
+      if (roomListener) roomListener();
+      roomRef = window.db.ref("rooms/" + roomId);
+
+      roomListener = roomRef.on("value", snapshot => {
+        const state = snapshot.val();
+
+        if (!state) {
+          setStatus("Phòng không tồn tại hoặc đã bị xóa.");
+          return;
+        }
+
+        renderState(state);
+      }, error => {
+        console.error(error);
+        setStatus("Không thể đọc phòng: " + error.message);
+      });
+    }
+
+    // ===================== CREATE ROOM =====================
+    async function createRoom() {
+      if (!firebaseReady) {
+        alert("Bạn chưa điền firebaseConfig trong file index.html.");
+        return;
+      }
+
+      playerName = playerNameInput.value.trim() || "Người chơi 1";
+      myPlayerId = randomPlayerId();
+      roomId = randomRoomCode();
+      myRole = "host";
+
+      const initialState = {
+        createdAt: firebase.database.ServerValue.TIMESTAMP,
+        started: false,
+        gameOver: false,
+        theme: currentTheme,
+        score1: 0,
+        score2: 0,
+        currentTeam: 1,
+        currentWord: "",
+        nextKana: "",
+        usedWords: [],
+        history: [],
+        players: {
+          p1: { id: myPlayerId, name: playerName },
+          p2: null
+        }
+      };
+
+      try {
+        await window.db.ref("rooms/" + roomId).set(initialState);
+
+        roomCodeDisplay.textContent = roomId;
+        roomInfo.classList.remove("hidden");
+        roomInput.value = roomId;
+        hostControls.classList.remove("hidden");
+        setStatus("Đã tạo phòng. Gửi mã phòng cho người chơi thứ 2.", true);
+        listenToRoom();
+
+        // Put room in URL so sharing the URL also carries the room code.
+        const url = new URL(window.location.href);
+        url.searchParams.set("room", roomId);
+        history.replaceState({}, "", url);
+      } catch (error) {
+        console.error(error);
+        setStatus("Tạo phòng thất bại: " + error.message);
+      }
+    }
+
+    // ===================== JOIN ROOM =====================
+    async function joinRoom() {
+      if (!firebaseReady) {
+        alert("Bạn chưa điền firebaseConfig trong file index.html.");
+        return;
+      }
+
+      const code = roomInput.value.trim().toUpperCase();
+      if (!/^[A-Z0-9]{6}$/.test(code)) {
+        setStatus("Mã phòng phải có 6 ký tự.");
+        return;
+      }
+
+      playerName = playerNameInput.value.trim() || "Người chơi 2";
+      myPlayerId = randomPlayerId();
+      roomId = code;
+      myRole = "guest";
+
+      const ref = window.db.ref("rooms/" + roomId);
+
+      try {
+        const result = await ref.transaction(room => {
+          if (room === null) return; // abort if room doesn't exist
+          if (room.players?.p2) return; // room full
+          room.players = room.players || {};
+          room.players.p2 = { id: myPlayerId, name: playerName };
+          return room;
+        });
+
+        if (!result.committed) {
+          setStatus("Không vào được phòng: phòng không tồn tại hoặc đã đủ 2 người.");
+          return;
+        }
+
+        roomCodeDisplay.textContent = roomId;
+        roomInfo.classList.remove("hidden");
+        setStatus("Đã vào phòng thành công.", true);
+        listenToRoom();
+
+        const url = new URL(window.location.href);
+        url.searchParams.set("room", roomId);
+        history.replaceState({}, "", url);
+      } catch (error) {
+        console.error(error);
+        setStatus("Vào phòng thất bại: " + error.message);
+      }
+    }
+
+    // ===================== HOST START GAME =====================
+    async function startGame() {
+      if (myRole !== "host" || !roomRef || !localRoomState?.players?.p2) return;
+
+      const dict = [...dictionaries[currentTheme]];
+      let startCandidates = dict.filter(w => w.length <= 5);
+      if (startCandidates.length === 0) startCandidates = dict;
+
+      const currentWord = startCandidates[Math.floor(Math.random() * startCandidates.length)];
+      const nextKana = getLastKana(currentWord);
+
+      const newState = {
+        ...localRoomState,
+        theme: currentTheme,
+        started: true,
+        gameOver: false,
+        score1: 0,
+        score2: 0,
+        currentTeam: 1,
+        currentWord,
+        nextKana,
+        usedWords: [currentWord],
+        history: [{ word: currentWord, team: 0 }]
+      };
+
+      try {
+        await roomRef.set(newState);
+      } catch (error) {
+        console.error(error);
+        setStatus("Không thể bắt đầu game: " + error.message);
+      }
+    }
+
+    // ===================== GAME ACTIONS =====================
+    function getMyTeam(state) {
+      if (state?.players?.p1?.id === myPlayerId) return 1;
+      if (state?.players?.p2?.id === myPlayerId) return 2;
+      return 0;
+    }
+
+    function getDictionary(state) {
+      return dictionaries[state.theme] || dictionaries.general;
+    }
+
+    function validateWord(state, word) {
+      const dict = getDictionary(state);
+
+      if (!word || word.length < 2)
+        return { ok:false, msg:"Từ phải có ít nhất 2 chữ cái!" };
+
+      if (!/^[\u3040-\u309Fー]+$/.test(word))
+        return { ok:false, msg:"Chỉ được dùng hiragana thôi nhé! (あいうえお...)" };
+
+      if (word.endsWith("ん"))
+        return { ok:false, msg:"Không được kết thúc bằng ん! Người chơi mất 2 điểm.", fatal:true };
+
+      if ((state.usedWords || []).includes(word))
+        return { ok:false, msg:"Từ này đã được dùng rồi!" };
+
+      if (!word.startsWith(state.nextKana))
+        return { ok:false, msg:`Từ phải bắt đầu bằng 「${state.nextKana}」!` };
+
+      if (!dict.includes(word))
+        return { ok:false, msg:`Từ 「${word}」 không thuộc chủ đề ${getThemeName(state.theme)} hoặc chưa có trong từ điển.` };
+
+      return { ok:true };
+    }
+
+    async function submitWord() {
+      if (!roomRef || !localRoomState || localRoomState.gameOver) return;
+
+      const state = localRoomState;
+      const myTeam = getMyTeam(state);
+      if (myTeam !== state.currentTeam) return;
+
+      const word = wordInput.value.trim();
+      wordInput.value = "";
+
+      const check = validateWord(state, word);
+      if (!check.ok) {
+        showMessage(check.msg, "error");
+
+        if (check.fatal) {
+          const updates = {};
+          updates[`score${myTeam}`] = Math.max(0, (state[`score${myTeam}`] || 0) - 2);
+          updates.currentTeam = state.currentTeam === 1 ? 2 : 1;
+          await roomRef.update(updates);
+        }
+        return;
+      }
+
+      const usedWords = [...(state.usedWords || []), word];
+      const history = [...(state.history || []), { word, team: myTeam }];
+      const nextKana = getLastKana(word);
+
+      let score1 = state.score1 || 0;
+      let score2 = state.score2 || 0;
+
+      if (myTeam === 1) score1 += 1;
+      else score2 += 1;
+
+      const dict = getDictionary(state);
+      const remaining = dict.filter(w => w.startsWith(nextKana) && !usedWords.includes(w));
+
+      const updates = {
+        currentWord: word,
+        nextKana,
+        usedWords,
+        history,
+        score1,
+        score2
+      };
+
+      if (remaining.length === 0) {
+        if (myTeam === 1) score1 += 3;
+        else score2 += 3;
+        updates.score1 = score1;
+        updates.score2 = score2;
+        updates.gameOver = true;
+      } else {
+        updates.currentTeam = state.currentTeam === 1 ? 2 : 1;
+      }
+
+      await roomRef.update(updates);
+    }
+
+    async function skipTurn() {
+      if (!roomRef || !localRoomState || localRoomState.gameOver) return;
+
+      const state = localRoomState;
+      const myTeam = getMyTeam(state);
+      if (myTeam !== state.currentTeam) return;
+
+      const updates = {};
+      updates[`score${myTeam}`] = Math.max(0, (state[`score${myTeam}`] || 0) - 1);
+      updates.currentTeam = state.currentTeam === 1 ? 2 : 1;
+      await roomRef.update(updates);
+    }
+
+    async function restartToStart() {
+      if (myRole !== "host" || !roomRef || !localRoomState) return;
+
+      await roomRef.update({
+        started: false,
+        gameOver: false,
+        score1: 0,
+        score2: 0,
+        currentTeam: 1,
+        currentWord: "",
+        nextKana: "",
+        usedWords: [],
+        history: []
+      });
+
+      gameStarted = false;
+      gameScreen.style.display = "none";
+      startScreen.style.display = "block";
+      hostControls.classList.remove("hidden");
+    }
+
+    // ===================== EVENTS =====================
+    themeBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        themeBtns.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentTheme = btn.dataset.theme;
+      });
+    });
+
+    createBtn.addEventListener("click", createRoom);
+    joinBtn.addEventListener("click", joinRoom);
+    startBtn.addEventListener("click", startGame);
+    submitBtn.addEventListener("click", submitWord);
+    skipBtn.addEventListener("click", skipTurn);
+    restartBtn.addEventListener("click", restartToStart);
+
+    wordInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") submitWord();
+    });
+
+    // ===================== AUTO-JOIN FROM URL =====================
+    window.addEventListener("load", () => {
+      if (!firebaseReady) {
+        setStatus("Firebase chưa được cấu hình. Hãy điền firebaseConfig trong file.");
+        return;
+      }
+
+      const urlRoom = new URLSearchParams(window.location.search).get("room");
+      if (urlRoom) {
+        roomInput.value = urlRoom.toUpperCase();
+        setStatus("Đã nhận mã phòng từ link. Nhập tên rồi bấm Vào phòng.");
+      } else {
+        setStatus("Firebase đã kết nối. Tạo phòng hoặc nhập mã phòng.", true);
+      }
+    });
+  </script>
+</body>
+</html>
